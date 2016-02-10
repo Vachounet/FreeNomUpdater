@@ -9,18 +9,28 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
+using ManyConsole;
 
 namespace FreeNom
 {
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
+            // locate any commands in the assembly (or use an IoC container, or whatever source)
+            var commands = GetCommands();
+            
+
             //SSL
             ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
 
-            //Start process
-            FreeNom updater = new FreeNom();
+            // then run them.
+            return ConsoleCommandDispatcher.DispatchCommand(commands, args, Console.Out);
+        }
+
+        public static IEnumerable<ConsoleCommand> GetCommands()
+        {
+            return ConsoleCommandDispatcher.FindCommandsInSameAssemblyAs(typeof(Program));
         }
 
     }
