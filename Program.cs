@@ -14,16 +14,13 @@ namespace FreeNom
 {
     class Program
     {
-
-
-
         static void Main(string[] args)
         {
-
-            FreeNom updater = new FreeNom();
-
+            //SSL
             ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
 
+            //Start process
+            FreeNom updater = new FreeNom();
         }
 
     }

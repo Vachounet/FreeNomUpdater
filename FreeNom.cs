@@ -11,23 +11,62 @@ namespace FreeNom
 {
     public class FreeNom
     {
+        /// <summary>
+        /// BackOffice URL
+        /// </summary>
         private const string _tokenURL = "https://my.freenom.com/clientarea.php";
-        private const string _updateToken = "https://my.freenom.com/clientarea.php?action=domaindetails&id=";
-        private const string _doLogin = "https://my.freenom.com/dologin.php";
-        private const string _updateURL = "https://my.freenom.com/clientarea.php?managedns=&domainid=";
 
+        /// <summary>
+        /// Random URL to get token from
+        /// </summary>
+        private const string _updateToken = "https://my.freenom.com/clientarea.php?action=domaindetails&id=1012676620";
+
+        /// <summary>
+        /// Auth URL
+        /// </summary>
+        private const string _doLogin = "https://my.freenom.com/dologin.php";
+
+        /// <summary>
+        /// Update URL - Where to send updated date
+        /// </summary>
+        private const string _updateURL = "https://my.freenom.com/clientarea.php?managedns=vache.ml&domainid=1012676620";
+
+        /// <summary>
+        /// Get IP from IPIFY service
+        /// </summary>
         private const string _ipURL = "https://api.ipify.org/";
 
+        /// <summary>
+        /// Current user token (connected or net)
+        /// Used for queries
+        /// </summary>
         public string CurrentToken;
 
+        /// <summary>
+        /// Current Cookies
+        /// USerd for queries
+        /// </summary>
         public CookieContainer CookieCont;
 
+        /// <summary>
+        /// Where to get domains from
+        /// </summary>
         public string HTMLToParse;
 
+        /// <summary>
+        /// Populated found subdomain for current
+        /// domain
+        /// </summary>
         public List<SubDomain> SubDomains;
 
+        /// <summary>
+        /// Current real IP
+        /// </summary>
         public string CurrentIP;
 
+        /// <summary>
+        /// Get username from config
+        /// </summary>
         public string UserName
         {
             get
@@ -36,6 +75,9 @@ namespace FreeNom
             }
         }
 
+        /// <summary>
+        /// Get password from config
+        /// </summary>
         public string Password
         {
             get
@@ -44,6 +86,9 @@ namespace FreeNom
             }
         }
 
+        /// <summary>
+        /// Get domains ids from config
+        /// </summary>
         public List<string> DomainIDs
         {
             get
@@ -52,6 +97,9 @@ namespace FreeNom
             }
         }
 
+        /// <summary>
+        /// Get domains names from config
+        /// </summary>
         public List<string> DomainNames
         {
             get
@@ -60,24 +108,38 @@ namespace FreeNom
             }
         }
 
-
-
+        /// <summary>
+        /// Launch process
+        /// </summary>
         public FreeNom()
         {
+            //Let's populate current ip
             GetCurrentIP();
 
+            //Stop process if IP not found
             if (string.IsNullOrEmpty(CurrentIP))
                 return;
 
             SubDomains = new List<SubDomain>();
 
+            //Get a new token to wonnect with
             CurrentToken = GetToken(_tokenURL, null, "/html/body/section/div/div/input");
 
-            DoLogin();
+            if (!string.IsNullOrEmpty(CurrentToken))
+            {
+                //Connect to FreeNom with provided credentials
+                DoLogin();
 
-            Logout();
+                //Logout from FreeNom
+                Logout();
+            }
+
+
         }
 
+        /// <summary>
+        /// End session
+        /// </summary>
         private void Logout()
         {
             var request = (HttpWebRequest)WebRequest.Create(_ipURL);
@@ -89,6 +151,9 @@ namespace FreeNom
             response.Close();
         }
 
+        /// <summary>
+        /// Get current IP from choosen service
+        /// </summary>
         private void GetCurrentIP()
         {
             try
@@ -108,6 +173,13 @@ namespace FreeNom
             }
         }
 
+        /// <summary>
+        /// Get a new token
+        /// </summary>
+        /// <param name="url">URL to get token from (doesn't work with all pages)</param>
+        /// <param name="cookie">Use a cookie if needed (url is an private page)</param>
+        /// <param name="path">XPath string to search token input value in HTML response</param>
+        /// <returns></returns>
         private string GetToken(string url, CookieContainer cookie, string path)
         {
             var request = (HttpWebRequest)WebRequest.Create(url);
@@ -143,8 +215,9 @@ namespace FreeNom
             return token;
         }
 
-
-
+        /// <summary>
+        /// Get a new session and populate cookie
+        /// </summary>
         private void DoLogin()
         {
             var requestLogin = (HttpWebRequest)WebRequest.Create(_doLogin);
@@ -174,6 +247,10 @@ namespace FreeNom
             GetDomains(HTMLToParse);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="html">HTML string</param>
         private void GetDomains(string html)
         {
             HtmlDocument doc = new HtmlDocument();
@@ -219,7 +296,85 @@ namespace FreeNom
 
             }
 
+            SubDomains = new List<SubDomain>();
 
+            string newID = (SubDomains.Count).ToString();
+            string newID2 = (SubDomains.Count + 1).ToString();
+            string newID3 = (SubDomains.Count + 2).ToString();
+            string newID4 = (SubDomains.Count + 2).ToString();
+            string newID5 = (SubDomains.Count + 2).ToString();
+            string newID6 = (SubDomains.Count + 2).ToString();
+
+            
+
+            SubDomain sub = new SubDomain { ID = newID, Line = "", TTL = "14440", Type = "A", Value = CurrentIP, Name = "f" };
+            SubDomains.Add(sub);
+
+            sub = new SubDomain { ID = newID2, Line = "", TTL = "14440", Type = "A", Value = CurrentIP, Name = "s" };
+            SubDomains.Add(sub);
+
+            sub = new SubDomain { ID = newID3, Line = "", TTL = "14440", Type = "A", Value = CurrentIP, Name = "search" };
+            SubDomains.Add(sub);
+
+            sub = new SubDomain { ID = newID4, Line = "", TTL = "14440", Type = "A", Value = CurrentIP, Name = "tor" };
+            SubDomains.Add(sub);
+
+            sub = new SubDomain { ID = newID5, Line = "", TTL = "14440", Type = "A", Value = CurrentIP, Name = "sick" };
+            SubDomains.Add(sub);
+
+
+            if (SubDomains.Count > 1)
+            {
+                //UpdateData();
+                AddDomains();
+            }
+        }
+
+        private void AddDomains()
+        {
+            var postData = "&token=" + CurrentToken;
+            postData += "&dnsaction=add";
+
+            string tmp = string.Empty;
+            foreach (SubDomain dom in SubDomains)
+            {
+                Console.WriteLine("Adding " + dom.Name + " to " + CurrentIP);
+                tmp += "&addrecord[" + dom.ID + "][type]=" + dom.Type;
+                tmp += "&addrecord[" + dom.ID + "][name]=" + dom.Name;
+                tmp += "&addrecord[" + dom.ID + "][ttl]=" + dom.TTL;
+                tmp += "&addrecord[" + dom.ID + "][value]=" + CurrentIP;//+ dom.Value;
+                tmp += "&addrecord[" + dom.ID + "][priority]=";
+                tmp += "&addrecord[" + dom.ID + "][port]=";
+                tmp += "&addrecord[" + dom.ID + "][weight]=";
+                tmp += "&addrecord[" + dom.ID + "][forward_type]=1";
+
+            }
+
+            postData = postData + tmp;
+
+            var requestLogin = (HttpWebRequest)WebRequest.Create(_updateURL);
+
+
+            var data = Encoding.ASCII.GetBytes(postData);
+
+            requestLogin.Method = "POST";
+            requestLogin.ContentType = "application/x-www-form-urlencoded";
+            // Cookie = new CookieContainer();
+            requestLogin.CookieContainer = CookieCont;
+            requestLogin.ContentLength = data.Length;
+
+            using (var stream = requestLogin.GetRequestStream())
+            {
+                stream.Write(data, 0, data.Length);
+            }
+
+            var responseLogin = (HttpWebResponse)requestLogin.GetResponse();
+
+            var responseStringLogin = new StreamReader(responseLogin.GetResponseStream()).ReadToEnd();
+        }
+
+        private void UpdateData()
+        {
             var postData = "&token=" + CurrentToken;
             postData += "&dnsaction=modify";
 
@@ -257,9 +412,11 @@ namespace FreeNom
 
             var responseStringLogin = new StreamReader(responseLogin.GetResponseStream()).ReadToEnd();
         }
-
     }
 
+    /// <summary>
+    /// Store subdomains
+    /// </summary>
     public class SubDomain
     {
         public string Name;
