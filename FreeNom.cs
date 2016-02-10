@@ -130,6 +130,16 @@ namespace FreeNom
                 //Connect to FreeNom with provided credentials
                 DoLogin();
 
+                //Get subdomains
+                GetDomains(HTMLToParse);
+
+                //Update subdomains
+                if (SubDomains.Count > 1)
+                {
+                    UpdateData();
+                    //AddDomains();
+                }
+
                 //Logout from FreeNom
                 Logout();
             }
@@ -243,8 +253,6 @@ namespace FreeNom
             var responseStringLogin = new StreamReader(responseLogin.GetResponseStream()).ReadToEnd();
 
             CurrentToken = GetToken(_updateURL, CookieCont, "/html/body/section/section/section/section/section/input");
-
-            GetDomains(HTMLToParse);
         }
 
         /// <summary>
@@ -296,38 +304,6 @@ namespace FreeNom
 
             }
 
-            SubDomains = new List<SubDomain>();
-
-            string newID = (SubDomains.Count).ToString();
-            string newID2 = (SubDomains.Count + 1).ToString();
-            string newID3 = (SubDomains.Count + 2).ToString();
-            string newID4 = (SubDomains.Count + 2).ToString();
-            string newID5 = (SubDomains.Count + 2).ToString();
-            string newID6 = (SubDomains.Count + 2).ToString();
-
-            
-
-            SubDomain sub = new SubDomain { ID = newID, Line = "", TTL = "14440", Type = "A", Value = CurrentIP, Name = "f" };
-            SubDomains.Add(sub);
-
-            sub = new SubDomain { ID = newID2, Line = "", TTL = "14440", Type = "A", Value = CurrentIP, Name = "s" };
-            SubDomains.Add(sub);
-
-            sub = new SubDomain { ID = newID3, Line = "", TTL = "14440", Type = "A", Value = CurrentIP, Name = "search" };
-            SubDomains.Add(sub);
-
-            sub = new SubDomain { ID = newID4, Line = "", TTL = "14440", Type = "A", Value = CurrentIP, Name = "tor" };
-            SubDomains.Add(sub);
-
-            sub = new SubDomain { ID = newID5, Line = "", TTL = "14440", Type = "A", Value = CurrentIP, Name = "sick" };
-            SubDomains.Add(sub);
-
-
-            if (SubDomains.Count > 1)
-            {
-                //UpdateData();
-                AddDomains();
-            }
         }
 
         private void AddDomains()
